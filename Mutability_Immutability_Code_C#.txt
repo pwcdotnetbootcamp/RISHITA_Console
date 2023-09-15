@@ -1,0 +1,26 @@
+using System;
+using System.Text;
+
+namespace Prj1Day1Con
+{
+    internal class Program
+    {   public static void concat1(string s1)
+        {
+            s1 = s1 + "Das";
+        }
+        public static void concat2(StringBuilder s2)
+        {
+            s2.Append("Das");
+        }
+        static void Main(string[] args)
+        {
+            String s1 = "Rishita";
+            concat1 (s1);
+            Console.WriteLine("Using String class : " + s1);
+
+            StringBuilder s2 = new StringBuilder("Rishita");
+            concat2 (s2);
+            Console.WriteLine("Using StringBuilder Class : " + s2);
+        }
+    }
+}
