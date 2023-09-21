@@ -1,0 +1,15 @@
+
+CREATE PROCEDURE dbo.PrintNumbersDescending
+    @maxNumber INT
+AS
+BEGIN
+    
+    DECLARE @currentNumber INT = @maxNumber;
+
+    WHILE @currentNumber >= 1
+    BEGIN
+        PRINT CAST(@currentNumber AS NVARCHAR(10));
+        SET @currentNumber = @currentNumber - 1;
+    END
+END;
+EXEC dbo.PrintNumbersDescending @maxNumber = 10;
