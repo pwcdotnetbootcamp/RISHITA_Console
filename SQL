@@ -1,3 +1,24 @@
+CREATE FUNCTION dbo.chkPrime (@num INT)
+RETURNS NVARCHAR(3)
+AS
+BEGIN
+    DECLARE @is_prime NVARCHAR(3);
+    DECLARE @i INT = 2;
+    
+    WHILE @i <= SQRT(@num)
+    BEGIN
+        IF @num % @i = 0
+        BEGIN
+            SET @is_prime = 'no';
+            RETURN @is_prime;
+        END
+        SET @i = @i + 1;
+    END
+    
+    SET @is_prime = 'yes';
+    RETURN @is_prime;
+END;
+GO
 CREATE TABLE CUSTOMERS_Bkp1( 
    ID   INT              NOT NULL, 
    FIRST_NAME VARCHAR (20)     NOT NULL, 
