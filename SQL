@@ -1,3 +1,64 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Sql;
+using System.Data.SqlClient;
+
+namespace PrjADODC
+{
+    internal class Program
+    {
+        static void Main()
+        {
+                int f = 0;
+
+            Console.WriteLine("Enter the username :");
+            string username = Console.ReadLine();
+
+            Console.WriteLine("Enter the password:");
+            string password = Console.ReadLine();
+            try { 
+
+                    SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-O7LF2JA;Initial Catalog=training;Integrated Security=True");
+                        con.Open();
+
+                        SqlCommand cmd = new SqlCommand("Select * from login", con);
+                        cmd.CommandType = CommandType.Text;
+                        SqlDataReader rdr = cmd.ExecuteReader();
+
+
+
+
+                        while (rdr.Read())
+                        {
+                            if (username.Equals(rdr.GetString(0)) && password.Equals(rdr.GetString(1)))
+                            {
+                                f = 1;
+                                break;
+                            }
+                        }
+
+                        if (f == 1)
+                        {
+                            Console.WriteLine("Logged in");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Logged Out");
+                        }
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Console.ReadLine();
+            }
+        }
+    }
+}
+
+
 CREATE FUNCTION dbo.chkPrime (@num INT)
 RETURNS NVARCHAR(3)
 AS
