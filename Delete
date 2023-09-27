@@ -1,1 +1,182 @@
-l
+login_controller
+------------------------------------------------
+using Microsoft.AspNetCore.Mvc;
+
+namespace Day29MVC.Controllers
+{
+    public class LoginController : Controller
+    {
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult Authentication(string uname)
+        {
+            if (CRUD_ADO.CRUD.Authentication(uname))
+            {
+                return RedirectToAction("DeletePage");
+            }
+            return RedirectToAction("Index");
+
+        }
+        public IActionResult DeletePage(string name,string uname,string passwd)
+        {
+            if (CRUD_ADO.CRUD.DeletePage(name,uname,passwd))
+            {
+                return RedirectToAction("Success");
+            }
+            return RedirectToAction("Failure");
+
+        }
+
+
+
+        public IActionResult Success()
+        {
+            return View();
+        }
+        public IActionResult Failure()
+        {
+            return View();
+        }
+    }
+}
+
+
+class1.cs
+-------------------------------------------------
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Xml.Linq;
+
+namespace CRUD_ADO
+{
+    public class CRUD
+    {
+        public static Boolean Authentication(string uname)
+        {
+            try
+            {
+                SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-O7LF2JA;Initial Catalog=training;Integrated Security=True");
+                con.Open();
+                ///Select : Read R of CRUD
+                SqlCommand cmd = new SqlCommand("Select * from LoginTbl WHERE uname = @uname", con);
+                cmd.CommandType = CommandType.Text;
+                SqlDataReader rdr = cmd.ExecuteReader();
+                if (uname == rdr.GetString("uname"))
+                {
+                    return true;
+                }
+               
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return false;
+            }
+        }
+
+        public static Boolean DeletePage(string name, string uname, string passwd)
+        {
+            try
+            {
+                SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-O7LF2JA;Initial Catalog=training;Integrated Security=True");
+                con.Open();
+                //////Delete: D of CRUD
+
+                SqlCommand cmd = new SqlCommand("Delete from LoginTbl where name=@name AND uname=@uname AND passwd=@passwd", con);
+               
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@uname", uname);
+                cmd.Parameters.AddWithValue("@passwd", passwd);
+                cmd.CommandType = CommandType.Text;
+                int rt = cmd.ExecuteNonQuery();
+                if(rt >0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return false;
+            }
+        }
+    }
+}
+
+Success
+--------------------------------------
+<h1 >Welcome To Our Site.You Are Authenticated By Our Server</h1>
+
+
+<a href="/Login/Index">Login Page Again</a>
+
+
+failure
+-----------------------------------------------
+<h1>Welcome To Our Site.You Are Not Authenticated By Our Server</h1>
+
+
+<a href="/Login/Index">Login Page Again</a>
+
+Index
+------------------------------------
+
+<h1>
+    Login Authentication:
+    <br />
+    <form action="/Login/Authentication">
+        <table>
+            <tr>
+                <td>Enter Login Id: </td>
+                <td><input type="text" name="uname" /></td>
+            </tr>
+
+            <tr>
+                <td rowspan="2"><input type="submit" value="Delete an user" /></td>
+            </tr>
+        </table>
+
+    </form>
+
+
+
+
+</h1>
+
+DeletePage
+--------------------------------------
+<h1>
+    Delete a member :
+    <br />
+    <form action="/Login/DeletePage"> 
+        <table>
+            <tr>
+                <td>Enter Name: </td>
+                <td><input type="text" name="name" /></td>
+            </tr>
+            <tr>
+                <td>Enter Login Id: </td>
+                <td><input type="text" name="uname" /></td>
+            </tr>
+            <tr>
+                <td>Enter Password: </td>
+                <td><input type="text" name="passwd" /></td>
+            </tr>
+
+            <tr>
+                <td rowspan="2"><input type="submit" value="Delete " /></td>
+            </tr>
+        </table>
+
+   </form> 
+
+
+
+
+</h1>
