@@ -1,0 +1,183 @@
+Employee.cs
+------------
+namespace EmployeeMVC.Models
+{
+    public class Employee
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public Employee() { }
+        public Employee(int Id,string Name)
+        {
+            this.name = Name;
+            this.id = Id;
+        }
+
+        public override string ToString()
+        {
+            return "\nEmp: " + name + " with id: " + id;
+        }
+    }
+}
+
+Employees.cs
+--------------
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+
+namespace EmployeeMVC.Models
+{
+    public class Employees
+    {
+        public List<Employee> empList = new List<Employee>();
+        //defualt contruxtor
+       
+        // Constructor that accepts a list of employees -- parameterized constructor
+        public Employees(List<Employee> emps)
+        {
+            this.empList = emps;
+        }
+        public Employees(Employee emp)
+        {
+            this.empList.Add(emp);
+        }
+        public Employees()
+        {
+            AddEmp(111, "Rishita");
+            AddEmp(112, "Rick");
+            AddEmp(113, "Sahil");
+            AddEmp(114, "Ipsita");
+        }
+
+        // Return the list of employees
+        public List<Employee> returnList()
+        {
+            return empList;
+        }
+
+        // Add a new employee
+        public List<Employee> AddEmp(int Id, string Name)
+        {
+            empList.Add(new Employee(Id, Name));
+            return empList;
+        }
+       
+        //Search by Id
+        public string SearchId(int Id)
+        {
+            foreach (Employee emp in empList)
+            {
+                if (emp.id == Id)
+                {
+                    return emp.name;
+                }
+            }
+            return "Id not found";
+        }
+        //Search by Name
+        public List<Employee> SearchName(string Name)
+        {
+            List<Employee> list = new List<Employee>();
+           
+            foreach (Employee emp in empList)
+            {
+                if (emp.name == Name)
+                {
+                    list.Add(emp);
+                }
+            }
+            return list;
+        }
+
+
+    }
+}
+
+Index.cstml
+------------
+<h1>
+    Welcome to Employee Database :
+    <br />
+
+</h1>
+<h3>Choose an Option :</h3>
+<a href="/Emp/AddForm">Add an Employee</a>
+<br />
+<a href="/Emp/SearchIDForm">Search an Employee by Id</a>
+<br />
+<a href="/Emp/SearchNameForm">Search an Employee by Name</a>
+  
+<br />
+<a href="/Emp/Show">Link to JSON format view</a>
+
+
+AddForm.cshtml
+--------------
+<form action="/Emp/AddEmp">
+     <label for="userame">Username:</label>
+    <input type="text" id="username" name="username" required><br>
+    <label for="id">Id:</label>
+    <input type="text" id="id" name="id" required><br/>
+    <input type="submit" value="add"/>
+</form>
+
+AddEmp.cshtml
+------------------
+<h1> Added to the list of the Employees !</h1>
+<a href="/Emp/Show">Link to see the Employee List</a>
+<br />
+<a href="/Emp/SearchIDForm">Click to search by id</a>
+<br />
+<a href="/Emp/SearchNameForm">Link to search by name</a>
+
+Controller
+--------------
+using EmployeeMVC.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+
+namespace EmployeeMVC.Controllers
+{
+    public class EmpController : Controller
+    { Employees empst = new Employees();
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult AddForm()
+        {
+            return View();
+        }
+        public IActionResult SearchIDForm()
+        {
+            return View();
+        }
+        public IActionResult SearchNameForm()
+        {
+            return View();
+        }
+
+        public JsonResult Show()
+        {
+            //show the list
+            return Json(empst.returnList());
+        }
+        public IActionResult AddEmp(int Id ,string Name) {
+            empst.AddEmp(Id, Name);
+            return View();
+        }
+        public IActionResult SearchId(int Id)
+        {
+            
+            
+           ViewData["message"] = empst.SearchId(Id);
+            return View();
+        }
+        public IActionResult SearchName(string Name)
+        { 
+            return View(empst.SearchName(Name));
+        }
+    }
+}
+
