@@ -1,0 +1,206 @@
+Question.cs
+---------------------------------------------------------------------------------------
+namespace ExamMVC.Models
+{
+    public class Question
+    {
+        public int QID {  get; set; }
+        public string Ques {  get; set; }
+        public string Option1 { get; set; }
+        public string Option2 { get; set; }
+
+        public string Option3 { get; set; }
+        public string Option4 { get; set; }
+
+        public string Ans { get; set; }
+
+       
+        //defualt constructor
+        public Question() { }
+
+        //parameterized constructor
+        public Question(int QID,string Ques,string Option1,string Option2,string Ans)
+        {
+            QID = QID;
+            Ques = Ques;
+            Option1 = Option1;
+            Option2 = Option2;
+         
+            Ans = Ans;
+        }
+
+        //tostring method
+        public override string ToString()
+        {
+            return " Question ID :" + QID + " Question: " + Ques + " Option 1 :" +Option1 + " Option 2:" 
+                + Option2 + " and the Ans : " + Ans;
+        }
+    }
+}
+================================================================================================================================================
+QuestionList.cs
+-----------------------
+using System;
+using System.Collections.Generic;
+
+namespace ExamMVC.Models
+{
+    public class QuestionList
+    {
+        public List<Question> questionLists = new List<Question>();
+
+        public QuestionList() {
+                questionLists.Add(new Question(1, "Are you good ?", "yes", "no","yes"));
+            questionLists.Add(new Question(2, "is your health good ?", "yes", "no", "no"));
+            questionLists.Add(new Question(3, "is your physical health good?", "yes", "no", "no"));
+            questionLists.Add(new Question(4, "Are you nervous ?", "yes", "no", "yes"));
+            questionLists.Add(new Question(5, "Are you sick ?", "yes", "no", "no"));
+             }
+
+        public List<Question> GetQuestionLists()
+        {
+            List<Question> list = new List<Question>();
+            var random = new Random();
+            int count = 0;
+            while(count < 3)
+            {
+                int randomIndex = random.Next(questionLists.Count);
+                list.Add(questionLists[randomIndex]);
+                count++;
+            }
+            return list;
+        }
+
+        public string GetAns(int QID)
+        {
+            
+           foreach(var item in questionLists)
+            {
+                if(item.QID == QID)
+                {
+                    return item.Ans;
+                }
+            }
+           return null;
+        }
+       
+       
+    }
+}
+================================================================================================================
+QuizController
+-----------------------
+using ExamMVC.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
+
+namespace ExamMVC.Controllers
+{
+    public class QuizController : Controller
+    {
+        static int[] marks = new int[3] { 0, 0, 0 };
+        static QuestionList quiz = new QuestionList();
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult Quiz1(string name)
+        {   
+            //creating a random list to get the list in from the questionlist
+            List<Question> randomQues = quiz.GetQuestionLists();
+
+            //taking the name
+            ViewData["name"] = name;
+            
+            //checking if the random question exists or not
+            if (randomQues != null)
+            {
+                ViewData["Q1"] = randomQues[0];
+            }
+            else
+            {
+                return NotFound();
+            }
+            return View();
+        }
+        public IActionResult Quiz2(string name, string ans1)
+        {
+            List<Question> randomQues = quiz.GetQuestionLists();
+            ViewData["name"] = name;
+            int questID = Convert.ToInt32(Request.Form["QID"]);
+            if (quiz.GetAns(questID) == ans1)
+            {
+                marks[0] = 10;
+            }
+            Question question2 = randomQues[1];
+
+            ViewData["Q2"] = question2;
+
+            return View();
+        }
+        public IActionResult Quiz3(string name, string ans2)
+        {
+            List<Question> randomQues = quiz.GetQuestionLists();
+            ViewData["name"] = name;
+            int questID = Convert.ToInt32(Request.Form["QID"]);
+            if (quiz.GetAns(questID) == ans2)
+            {
+                marks[1] = 10;
+            }
+            Question question3 = randomQues[2];
+
+            ViewData["Q3"] = question3;
+
+            return View();
+        }
+
+        public IActionResult Result(string name, string ans3)
+        {
+            List<Question> randomQues = quiz.GetQuestionLists();
+            int sum = 0;
+            ViewData["name"] = name;
+            int questID = Convert.ToInt32(Request.Form["QID"]);
+            if (quiz.GetAns(questID) == ans3)
+            {
+                marks[2] = 10;
+            }
+
+            //adding the result
+            foreach (int num in marks)
+            {
+                sum += num;
+            }
+            ViewData["ans"] = sum;
+
+            return View();
+        }
+    }
+}
+===============================================================================
+Quiz1.cshtml
+
+----------
+@{
+    // Retrieve the question from ViewData
+    Question question1 = ViewData["Q1"] as Question;
+}
+
+<h1>First question to you @ViewData["name"] : </h1>
+
+//displaying the question
+<p>@question1.Ques</p>
+
+<form action="/Quiz/Quiz2">
+    Enter your Answer :
+    <label for="yes">Yes</label>
+    <input type="radio" id="yes" name="ans1" value="yes">
+    <label for="no">No</label>
+    <input type="radio" id="no" name="ans1" value="no">
+    <br>
+    <input type="hidden" name="QID" value="@question1.QID">
+    <input type="hidden" name="name" value="@ViewData["name"]">
+    <input type="submit" value="Submit">
+</form>
