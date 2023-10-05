@@ -1,0 +1,111 @@
+using System.Collections.Generic;
+
+namespace Day34EXC.Models
+{
+    public class StudentList
+    {
+        public List<Student> Students = new List<Student>();
+
+        public StudentList()
+        {
+            Students.Add(new Student("rishita", 1, "dbms"));
+            Students.Add(new Student("rohit", 2, "sql"));
+            Students.Add(new Student("ambika", 3, "c#"));
+            Students.Add(new Student("srijita", 4, "java"));
+        }
+
+        public List<Student> GetStudents()
+        {
+            return Students;
+        }
+
+        public void AddStudent(string name, int id, string course)
+        {
+            Students.Add(new Student(name, id, course));
+        }
+    }
+}
+
+
+
+
+namespace Day34EXC.Models
+{
+    public class Student
+    {
+        public string name { get; set; }
+
+        public int id { get; set; }
+
+        public string course { get; set; }
+
+        public Student() { }
+
+        public Student(string name, int id, string course)
+        {
+            this.name = name;
+            this.id = id;
+            this.course = course;
+        }
+
+        public override string ToString()
+        {
+            return "Name :" + name + " Id :" + id + " Course :" + course;
+        }
+    }
+}
+
+
+
+using Day34EXC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Day34EXC.Controllers
+{
+    public class DisplayController : Controller
+    {
+        static StudentList st = new StudentList();
+        //anyone can view
+        public IActionResult Index()
+        {
+            
+            return View(st.GetStudents());
+        }
+
+        
+
+       
+        [Authorize]
+        public IActionResult AuthorisedOnly(string name,int id,string course)
+        {
+            st.AddStudent(name, id, course);
+            return View(st.GetStudents());
+        }
+
+    }
+}
+
+
+
+@{
+    ViewData["Title"] = "Add Student";
+}
+
+<h1>Add Student</h1>
+
+<form asp-action="AddStudent">
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name"  required />
+    </div>
+    <div class="form-group">
+        <label for="id">ID:</label>
+        <input type="number" id="id" name="id"  required />
+    </div>
+    <div class="form-group">
+        <label for="course">Course:</label>
+        <input type="text" id="course" name="course"  required />
+    </div>
+    <button type="submit">Submit</button>
+</form>
