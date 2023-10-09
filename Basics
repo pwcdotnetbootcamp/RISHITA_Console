@@ -1,0 +1,129 @@
+Student.cs
+namespace Day37API.Models
+{
+    public class Student
+    {
+        public int StudentId { get; set; }
+        public string Name { get; set; }
+        public string SurName { get; set; }
+
+
+        public Student(int studentId, string name, string surName)
+        {
+            StudentId = studentId;
+            Name = name;
+            SurName = surName;
+        }
+
+    }
+}
+--------------------------------------------------------------------------------------------------
+StudentContext.cs
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Day37WebAPI.Models
+{
+    public class StudentContext
+    {
+        public List<Student> Students { get; set; }
+
+        public StudentContext()
+        {
+            Students = new List<Student>
+            {
+                new Student(101, "Abc", "xyz"),
+                new Student(102, "Abc2", "xyz2"),
+                new Student(103, "Abc3", "xyz3"),
+                new Student(104, "Abc4", "xyz4"),
+                new Student(105, "Abc5", "xyz5"),
+                new Student(106, "Abc6", "xyz6"),
+                new Student(107, "Abc7", "xyz7"),
+                new Student(108, "Abc8", "xyz8")
+            };
+        }
+
+        public List<Student> GetAllStudents()
+        {
+            return Students;
+        }
+
+        public Student GetStudent(int id)
+        {
+            return Students.FirstOrDefault(x => x.StudentId == id);
+        }
+
+        public void AddStudent(int id, string name, string surname)
+        {
+            Students.Add(new Student(id, name, surname));
+        }
+
+        public Student UpdateStudent(int id, string name, string surname)
+        {
+            Student studentToUpdate = Students.FirstOrDefault(s => s.StudentId == id);
+            if (studentToUpdate != null)
+            {
+                studentToUpdate.Name = name;
+                studentToUpdate.SurName = surname;
+            }
+            return studentToUpdate;
+        }
+
+        public Student DeleteStudent(int id)
+        {
+            Student studentToDelete = Students.FirstOrDefault(s => s.StudentId == id);
+            if (studentToDelete != null)
+            {
+                Students.Remove(studentToDelete);
+            }
+            return studentToDelete;
+
+        }
+    }
+}
+------------------------------------------------------------------------------------------------------------
+StudentsController.cs
+
+using Day37WebAPI.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+
+[Route("api/[controller]")]
+[ApiController]
+public class StudentsController : ControllerBase
+{
+    static StudentContext students = new StudentContext();
+
+    [HttpGet]
+    public ActionResult<IEnumerable<Student>> GetAllStudents()
+    {
+        return students.GetAllStudents();
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<Student> GetStudentById(int id)
+    {
+        return students.GetStudent(id);
+    }
+
+    [HttpPost("AddStud")]
+    public ActionResult<Student> AddStud(int id, string name, string surname)
+    {
+        students.AddStudent(id, name, surname);
+        return students.GetStudent(id); // Return the added student for confirmation
+    }
+
+    [HttpPost("UpdateStud")]
+    public ActionResult<Student> UpdateStud(int id, string name, string surname)
+    {
+        Student updatedStudent = students.UpdateStudent(id, name, surname);
+        return updatedStudent; // Return the updated student for confirmation
+    }
+
+    [HttpDelete("DeleteStud/{id}")]
+    public ActionResult<Student> DeleteStud(int id)
+    {
+        Student deletedStudent = students.DeleteStudent(id);
+        return deletedStudent; // Return the deleted student for confirmation
+    }
+}
